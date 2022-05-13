@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="RPS">
+      <option name="reflectiveCalls" value="true" />
+      <option name="deprecationWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <parameters>
+        <parameter value="-Xsource:2.13" />
+        <parameter value="-Xcheckinit" />
+      </parameters>
+      <plugins>
+        <plugin path="C:\Users\A17\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\edu\berkeley\cs\chisel3-plugin_2.13.7\3.5.2\chisel3-plugin_2.13.7-3.5.2.jar" />
+      </plugins>
+    </profile>
+  </component>
+</project>
