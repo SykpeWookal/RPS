@@ -1,0 +1,34 @@
+[
+  {
+    "class":"firrtl.stage.FirrtlFileAnnotation",
+    "file":"test_run_dir\\RPS.RegTestGen432831233\\RegisterFileGroup.lo.fir"
+  },
+  {
+    "class":"firrtl.EmitCircuitAnnotation",
+    "emitter":"firrtl.LowFirrtlEmitter"
+  },
+  {
+    "class":"logger.LogLevelAnnotation",
+    "globalLogLevel":{
+      
+    }
+  },
+  {
+    "class":"firrtl.transforms.BlackBoxTargetDirAnno",
+    "targetDir":"test_run_dir/RPS.RegTestGen432831233"
+  },
+  {
+    "class":"firrtl.transforms.CombinationalPath",
+    "sink":"~RegisterFileGroup|RegisterFileGroup>io_Rdata2",
+    "sources":[
+      "~RegisterFileGroup|RegisterFileGroup>io_Raddr2"
+    ]
+  },
+  {
+    "class":"firrtl.transforms.CombinationalPath",
+    "sink":"~RegisterFileGroup|RegisterFileGroup>io_Rdata1",
+    "sources":[
+      "~RegisterFileGroup|RegisterFileGroup>io_Raddr1"
+    ]
+  }
+]

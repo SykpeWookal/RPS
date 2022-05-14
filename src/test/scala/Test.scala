@@ -98,7 +98,7 @@ object CSR extends App {
   (new chisel3.stage.ChiselStage).emitVerilog(new CSR(isaParam))
 }
 
-object RPSTopGen extends App {
+object RPSGen extends App {
   val isaParam = new Param(XLEN = 32,
     ThreadNumber = 2,
     Embedded = false,

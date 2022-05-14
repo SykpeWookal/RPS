@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RPS.iml" filepath="$PROJECT_DIR$/.idea/modules/RPS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RPS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/RPS-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RPSCore.iml" filepath="$PROJECT_DIR$/.idea/modules/RPSCore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RPSCore-build.iml" filepath="$PROJECT_DIR$/.idea/modules/RPSCore-build.iml" />
     </modules>
   </component>
 </project>
