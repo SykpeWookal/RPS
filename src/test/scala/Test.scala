@@ -98,6 +98,19 @@ object CSR extends App {
   (new chisel3.stage.ChiselStage).emitVerilog(new CSR(isaParam))
 }
 
+object RPSTopGen extends App {
+  val isaParam = new Param(XLEN = 32,
+    ThreadNumber = 2,
+    Embedded = false,
+    Atomic = true,
+    Multiplication = false,
+    Compressed = false,
+    SingleFloatingPoint = false,
+    DoubleFloatingPoint = false)
+  (new chisel3.stage.ChiselStage).emitVerilog(new RPSTop(isaParam))
+}
+
+
 
 class CacheTest(c: Cache) extends PeekPokeTester(c) {
 

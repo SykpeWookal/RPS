@@ -21,10 +21,9 @@ class MemoryIO(private val isaParam: Param) extends Bundle{
   val TLAST = Input(Bool())
   val TUSER = Input(TUSERDefine())
 
-  //val writedata = Input(UInt(isaParam.XLEN.W))  //CPU写的数据，一次写一个word
-  //val outdata = Output(UInt(isaParam.XLEN.W))   //读出的数据，一次读一个word
 
-  //val miss = Output(Bool())
+  val debugMemAddr = Input(UInt(12.W))
+  val debugMemData = Output(UInt(isaParam.XLEN.W))
 }
 
 class Memory(private val isaParam: Param) extends Module{
@@ -91,4 +90,5 @@ class Memory(private val isaParam: Param) extends Module{
   io.TREADY := true.B
   io.TDATAR := TDATAR
 
+  io.debugMemData := mem.read(io.debugMemAddr)
 }

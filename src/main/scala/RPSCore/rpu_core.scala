@@ -97,7 +97,6 @@ class rpu_core(private val isaParam: Param) extends Module {
     // val reg_data = Output(UInt(32.W))
     val IMiss = Input(Bool())
     val DMiss = Input(Bool())
-
   })
 
   // thread control
