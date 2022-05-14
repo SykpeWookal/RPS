@@ -1,5 +1,5 @@
 
-package RPS
+package RPSCore
 
 import chisel3._
 import chisel3.util._

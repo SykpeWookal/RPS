@@ -1,5 +1,5 @@
 import Param.Param
-import RPS._
+import RPSCore._
 import Cache._
 import chisel3._
 import chisel3.util._
@@ -60,7 +60,17 @@ object CacheAXIGen extends App {
   (new chisel3.stage.ChiselStage).emitVerilog(new CacheAXI(isaParam))
 }
 
-
+object memGen extends App {
+  val isaParam = new Param(XLEN = 32,
+    ThreadNumber = 2,
+    Embedded = false,
+    Atomic = true,
+    Multiplication = false,
+    Compressed = false,
+    SingleFloatingPoint = false,
+    DoubleFloatingPoint = false)
+  (new chisel3.stage.ChiselStage).emitVerilog(new Memory(isaParam))
+}
 
 //Core综合
 object rpu_core extends App {

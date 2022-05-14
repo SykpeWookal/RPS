@@ -1,10 +1,10 @@
 
-package RPS
+package RPSCore
 
 import chisel3._
 import chisel3.util._
 
-import RPS.Constants._
+import RPSCore.Constants._
 
 class rpu_thread_control(thread_number: Int) extends Module {
   val io = IO(new Bundle {

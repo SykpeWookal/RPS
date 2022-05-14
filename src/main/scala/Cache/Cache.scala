@@ -19,6 +19,8 @@ class CacheIO(private val isaParam: Param) extends Bundle{
   val w_req = Input(Bool())                     //写请求
 
   val writedata = Input(UInt(isaParam.XLEN.W))  //CPU写的数据，一次写一个word
+  val writeMask = Input(UInt(4.W))  //写掩膜，写字节、半字、字、双字，暂支持32位
+
   val outdata = Output(UInt(isaParam.XLEN.W))   //读出的数据，一次读一个word
 
   val miss = Output(Bool())
@@ -128,7 +130,17 @@ class Cache(private val isaParam: Param) extends Module {
           //io.outdata := CacheMem(set_addr)(way_hit)(line_addr)
           out := CacheMem(set_addr)(way_hit)(line_addr)
         }.elsewhen(io.w_req === true.B){  //写请求
-          CacheMem(set_addr)(way_hit)(line_addr) := io.writedata
+          switch(io.writeMask){
+            is(1.U){//byte
+              CacheMem(set_addr)(way_hit)(line_addr) := Cat(0.U(24.W),io.writedata(7,0))
+            }
+            is(3.U){//half word
+              CacheMem(set_addr)(way_hit)(line_addr) := Cat(0.U(16.W),io.writedata(15,0))
+            }
+            is(15.U){//word
+              CacheMem(set_addr)(way_hit)(line_addr) := io.writedata
+            }
+          }
           dirty(set_addr)(way_hit) := true.B
         }.otherwise{
           cacheState := CacheStates.IDLE

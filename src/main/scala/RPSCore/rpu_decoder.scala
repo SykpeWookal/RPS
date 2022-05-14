@@ -1,9 +1,9 @@
-package RPS
+package RPSCore
 
 import chisel3._ 
 import chisel3.util._ 
 
-import RPS.Constants._
+import RPSCore.Constants._
 
 class rpu_decoder extends Module {
   val io = IO(new Bundle{
