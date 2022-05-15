@@ -3,25 +3,25 @@
     "class":"firrtl.transforms.DedupedResult",
     "original":"~RPSTop|Cache",
     "duplicate":"~RPSTop|RPSTop/Icache:Cache",
-    "index":0.6666666666666666
+    "index":0.625
   },
   {
     "class":"firrtl.transforms.DedupedResult",
     "original":"~RPSTop|Cache_1",
     "duplicate":"~RPSTop|RPSTop/Dcache:Cache",
-    "index":0.7333333333333333
+    "index":0.6875
   },
   {
     "class":"firrtl.transforms.DedupedResult",
     "original":"~RPSTop|CacheAXI",
     "duplicate":"~RPSTop|RPSTop/IcacheAXI:CacheAXI",
-    "index":0.8
+    "index":0.75
   },
   {
     "class":"firrtl.transforms.DedupedResult",
     "original":"~RPSTop|CacheAXI_1",
     "duplicate":"~RPSTop|RPSTop/DcacheAXI:CacheAXI",
-    "index":0.8666666666666667
+    "index":0.8125
   },
   {
     "class":"firrtl.EmitCircuitAnnotation",

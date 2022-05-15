@@ -23,14 +23,25 @@ class learnclassMem(length: Int) extends Module {
 
 
 class learnclass(length: Int) extends Module {
-  val io = IO(new Bundle {
-    val in = Flipped(Vec(2, Decoupled(UInt(8.W))))
-    val out = Decoupled(UInt(8.W))
-  })
-  // Arbiter doesn't have a convenience constructor, so it's built like any Module
-  val arbiter = Module(new RRArbiter(UInt(8.W), 2))  // 2 to 1 Priority Arbiter
-  arbiter.io.in <> io.in
-  io.out <> arbiter.io.out
+  // ram.scala
+    val io = IO(new Bundle {
+      val addr = Input(UInt(10.W))
+      val dataIn = Input(UInt(32.W))
+      val en = Input(Bool())
+      val we = Input(Bool())
+      val dataOut = Output(UInt(32.W))
+    })
+    val syncRAM = SyncReadMem(1024, UInt(32.W))
+    when(io.en) {
+      when(io.we) {
+        syncRAM.write(io.addr, io.dataIn)
+        io.dataOut := DontCare
+      } .otherwise {
+        io.dataOut := syncRAM.read(io.addr)
+      }
+    } .otherwise {
+      io.dataOut := DontCare
+    }
 }
 
 object T1 extends App {
@@ -126,7 +137,7 @@ object T2 extends App {
 
 object ttt extends App {
   val saturate = false
-  (new chisel3.stage.ChiselStage).emitVerilog(new learnclassMem(4))
+  (new chisel3.stage.ChiselStage).emitVerilog(new learnclass(4))
 }
 
 

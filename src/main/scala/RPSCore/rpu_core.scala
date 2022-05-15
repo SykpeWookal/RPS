@@ -91,6 +91,8 @@ class rpu_core(private val isaParam: Param) extends Module {
     val data_addr = Output(UInt(32.W))
     val data_wdata = Output(UInt(32.W))
     val data_rdata = Input(UInt(32.W))
+
+    val Dmem_ReadReq = Output(Bool()) //Dcache读请求
     // register file debug interface
     // val thread_sel = Input(UInt((log2Ceil(thread_number)).W))
     // val reg_addr = Input(UInt(5.W))
@@ -98,6 +100,7 @@ class rpu_core(private val isaParam: Param) extends Module {
     val IMiss = Input(Bool())
     val DMiss = Input(Bool())
   })
+
 
   // thread control
   val tc = Module(new rpu_thread_control(isaParam.ThreadNumber))
@@ -175,6 +178,8 @@ class rpu_core(private val isaParam: Param) extends Module {
   exmm_stage_reset.reg_write_src := reg_w_src_t.alu 
   exmm_stage_reset.reg_write_addr := 0.U 
   val exmm_stage_regs = RegInit(exmm_stage_reset)
+
+
 
   // MM/WB Stage Registers
   val mmwb_stage_reset = Wire(new mmwb_bundle())
@@ -376,7 +381,19 @@ class rpu_core(private val isaParam: Param) extends Module {
     exmm_stage_regs := exmm_stage_regs
   }
 
+
+
   // MM Stage
+
+  when( exmm_stage_regs.mem_op === mem_op_t.lw |
+    exmm_stage_regs.mem_op === mem_op_t.lb |
+    exmm_stage_regs.mem_op === mem_op_t.lbu |
+    exmm_stage_regs.mem_op === mem_op_t.lhu |
+    exmm_stage_regs.mem_op === mem_op_t.lhu){
+    io.Dmem_ReadReq := true.B
+  }.otherwise{
+    io.Dmem_ReadReq := false.B
+  }
   // TODO: THIS DOES NOT CONSIDER ALIGNED MEMORY ACCESS
   // You can add -strict-aligned label to gcc to satisfy this needs
   when (exmm_stage_regs.mem_write) {

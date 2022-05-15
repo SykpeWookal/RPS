@@ -112,6 +112,7 @@ class CacheAXI (private val isaParam: Param) extends Module {
     }
 
     is(CacheAXIStates.Resp){
+      TUSER := TUSERDefine.free
       cacheAXIState := CacheAXIStates.IDLE
     }
   }

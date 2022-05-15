@@ -9,6 +9,29 @@ object MemStates extends ChiselEnum {
   val IDLE,ReadReq,WriteReq = Value
 }
 
+class SinglePortRAM extends Module {
+  val io = IO(new Bundle {
+    val addr = Input(UInt(10.W))
+    val dataIn = Input(UInt(32.W))
+    val en = Input(Bool())
+    val we = Input(Bool())
+    val dataOut = Output(UInt(32.W))
+  })
+  val syncRAM = SyncReadMem(1<<13, UInt(32.W))
+  when(io.en) {
+    when(io.we) {
+      syncRAM.write(io.addr, io.dataIn)
+      io.dataOut := DontCare
+    } .otherwise {
+      io.dataOut := syncRAM.read(io.addr)
+    }
+  } .otherwise {
+    io.dataOut := DontCare
+  }
+}
+
+
+
 
 class MemoryIO(private val isaParam: Param) extends Bundle{
   ////////////AXI端///////////////
@@ -22,15 +45,17 @@ class MemoryIO(private val isaParam: Param) extends Bundle{
   val TUSER = Input(TUSERDefine())
 
 
-  val debugMemAddr = Input(UInt(12.W))
-  val debugMemData = Output(UInt(isaParam.XLEN.W))
+  //val debugMemAddr = Input(UInt(12.W))
+  //val debugMemData = Output(UInt(isaParam.XLEN.W))
+  //val debugMemWriteData = Input(UInt(isaParam.XLEN.W))
 }
 
 class Memory(private val isaParam: Param) extends Module{
   val io = IO(new MemoryIO(isaParam))
 
   //同步读写模块,存储器深度配置
-  val mem = SyncReadMem(1<<13,UInt(isaParam.XLEN.W))
+  val syncMem = Module(new SinglePortRAM)
+  syncMem.io.en := true.B
 
   //val TREADY = WireInit(true.B)                     //从设备就绪信号
   val TDATAR = WireInit(0.U(isaParam.XLEN.W))
@@ -42,8 +67,17 @@ class Memory(private val isaParam: Param) extends Module{
   val transferCounter = RegInit(0.U(32.W))//传输次数计数，最多支持2^32个字节流式传输
   val rwmemAddr = RegInit(0.U(30.W))//mem操作地址，word地址，右移2位
 
+
+  syncMem.io.dataIn := 0.U
+  syncMem.io.we := false.B
+  syncMem.io.addr := 0.U
   switch(memState){
     is(MemStates.IDLE){
+      /////////debugData/////////
+      syncMem.io.dataIn := 0.U
+      syncMem.io.we := false.B
+      syncMem.io.addr := 0.U
+      ///////////////////////////
       transferCounter := 0.U
       when(io.TVALID === true.B){
         when(io.TUSER === TUSERDefine.readReq){
@@ -59,7 +93,8 @@ class Memory(private val isaParam: Param) extends Module{
         when(transferCounter === 0.U){ //先传地址
           rwmemAddr := io.TDATAW << 2
         }.otherwise{
-          TDATAR := mem.read(rwmemAddr)
+          syncMem.io.addr := rwmemAddr
+          TDATAR := syncMem.io.dataOut
         }
         rwmemAddr := rwmemAddr + 1.U
         transferCounter := transferCounter + 1.U //传输计数 +1
@@ -73,7 +108,9 @@ class Memory(private val isaParam: Param) extends Module{
         when(transferCounter === 0.U){ //先传地址
           rwmemAddr := io.TDATAW << 2
         }.otherwise{
-          mem.write(rwmemAddr,io.TDATAW)
+          syncMem.io.addr := rwmemAddr
+          syncMem.io.dataIn := io.TDATAW
+          syncMem.io.we := true.B
         }
         rwmemAddr := rwmemAddr + 1.U
         transferCounter := transferCounter + 1.U //传输计数 +1
@@ -90,5 +127,6 @@ class Memory(private val isaParam: Param) extends Module{
   io.TREADY := true.B
   io.TDATAR := TDATAR
 
-  io.debugMemData := mem.read(io.debugMemAddr)
+  //io.debugMemData := syncMem.read(io.debugMemAddr)
+
 }

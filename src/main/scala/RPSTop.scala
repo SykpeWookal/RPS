@@ -16,8 +16,14 @@ class RPSIO(private val isaParam: Param) extends Bundle{
   //线程起始地址
   val boot_addr = Input(Vec(isaParam.ThreadNumber, UInt(32.W)))
 
-  val debugMemAddr = Input(UInt(12.W))
-  val debugMemData = Output(UInt(isaParam.XLEN.W))
+  //val debugMemAddr = Input(UInt(12.W))
+  //val debugMemData = Output(UInt(isaParam.XLEN.W))
+  //val debugMemWriteData = Input(UInt(isaParam.XLEN.W))
+
+  val debugCoreIAddr = Output(UInt(isaParam.XLEN.W))
+  val debugCoreDAddr = Output(UInt(isaParam.XLEN.W))
+  val debugCoreIData = Output(UInt(isaParam.XLEN.W))
+  val debugCoreDData = Output(UInt(isaParam.XLEN.W))
 }
 
 class RPSTop(private val isaParam: Param) extends Module{
@@ -50,7 +56,7 @@ class RPSTop(private val isaParam: Param) extends Module{
   Dcache.io.writedata := core.io.data_wdata
 
   Icache.io.r_req := true.B
-  Dcache.io.r_req := false.B
+  Dcache.io.r_req := core.io.Dmem_ReadReq
   /////待处理：读请求
   /////////////////////////////////////////
   Icache.io.mem_rd_line := IcacheAXI.io.mem_rd_line
@@ -68,17 +74,17 @@ class RPSTop(private val isaParam: Param) extends Module{
   DcacheAXI.io.mem_wr_req := Dcache.io.mem_wr_req
   DcacheAXI.io.mem_wr_line := Dcache.io.mem_wr_line
 
-  val cid = RegInit(BusArbiterState.IRound)
+  val cid = RegInit(BusArbiterState.DRound)
 
   ///////////选择master///////////////
-  mem.io.TDATAW := 0.U
-  mem.io.TUSER := TUSERDefine.free
-  mem.io.TVALID := false.B
-  mem.io.TLAST := false.B
-  IcacheAXI.io.TREADY := false.B
-  IcacheAXI.io.TDATAR := 0.U
-  DcacheAXI.io.TREADY := false.B
-  DcacheAXI.io.TDATAR := 0.U
+//  syncMem.io.TDATAW := 0.U
+//  syncMem.io.TUSER := TUSERDefine.free
+//  syncMem.io.TVALID := false.B
+//  syncMem.io.TLAST := false.B
+//  IcacheAXI.io.TREADY := false.B
+//  IcacheAXI.io.TDATAR := 0.U
+//  DcacheAXI.io.TREADY := false.B
+//  DcacheAXI.io.TDATAR := 0.U
   when(cid === BusArbiterState.IRound){ //ICacheRound
     mem.io.TDATAW := IcacheAXI.io.TDATAW
     mem.io.TUSER := IcacheAXI.io.TUSER
@@ -86,6 +92,8 @@ class RPSTop(private val isaParam: Param) extends Module{
     mem.io.TLAST := IcacheAXI.io.TLAST
     IcacheAXI.io.TREADY := mem.io.TREADY
     IcacheAXI.io.TDATAR := mem.io.TDATAR
+    DcacheAXI.io.TREADY := false.B
+    DcacheAXI.io.TDATAR := 0.U
   }.elsewhen(cid === BusArbiterState.DRound){//DCacheRound
     mem.io.TDATAW := DcacheAXI.io.TDATAW
     mem.io.TUSER := DcacheAXI.io.TUSER
@@ -93,20 +101,38 @@ class RPSTop(private val isaParam: Param) extends Module{
     mem.io.TLAST := DcacheAXI.io.TLAST
     DcacheAXI.io.TREADY := mem.io.TREADY
     DcacheAXI.io.TDATAR := mem.io.TDATAR
+    IcacheAXI.io.TREADY := false.B
+    IcacheAXI.io.TDATAR := 0.U
+  }.otherwise{
+    mem.io.TDATAW := 0.U
+    mem.io.TUSER := TUSERDefine.free
+    mem.io.TVALID := false.B
+    mem.io.TLAST := false.B
+    DcacheAXI.io.TREADY := false.B
+    DcacheAXI.io.TDATAR := 0.U
+    IcacheAXI.io.TREADY := false.B
+    IcacheAXI.io.TDATAR := 0.U
   }
+
+
   ///////////更新cid///////////
   when(cid === BusArbiterState.IRound){ //ICacheRound
-    when(IcacheAXI.io.TUSER =/= TUSERDefine.free){
+    when(IcacheAXI.io.TUSER === TUSERDefine.free){
       cid := BusArbiterState.DRound
     }
   }.elsewhen(cid === BusArbiterState.DRound){//DCacheRound
-    when(DcacheAXI.io.TUSER =/= TUSERDefine.free){
+    when(DcacheAXI.io.TUSER === TUSERDefine.free){
       cid := BusArbiterState.IRound
     }
   }
 
 
-  mem.io.debugMemAddr := io.debugMemAddr
-  io.debugMemData := mem.io.debugMemData
+  //mem.io.debugMemAddr := io.debugMemAddr
+  //io.debugMemData := mem.io.debugMemData
+  //mem.io.debugMemWriteData := io.debugMemWriteData
 
+  io.debugCoreIAddr := core.io.instr_addr
+  io.debugCoreDAddr := core.io.data_addr
+  io.debugCoreIData := Icache.io.outdata
+  io.debugCoreDData := Dcache.io.outdata
 }
