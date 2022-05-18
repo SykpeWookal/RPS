@@ -52,7 +52,7 @@ class CacheAXI (private val isaParam: Param) extends Module {
 
   val TDATAW = WireInit(0.U(isaParam.XLEN.W))
 
-  val rdLine = RegInit(VecInit(Seq.fill(isaParam.LINE_SIZE)(0.U)))//read Line
+  val rdLine = RegInit(VecInit(Seq.fill(isaParam.LINE_SIZE)(0.U(isaParam.XLEN.W))))//read Line
 
   switch(cacheAXIState){
     is(CacheAXIStates.IDLE){

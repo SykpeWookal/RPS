@@ -45,10 +45,10 @@ class Param(val XLEN: Int,
   def jimm20Ranges: List[(Int, Int)] = List((31, 31), (19, 12), (20, 20), (30, 25), (24, 21))
 
   //Cache Param
-  def LINE_ADDR_LEN:Int = 3  //line内地址长度，决定了每个line具有2^3个word
-  def SET_ADDR_LEN:Int = 3   // 组地址长度，决定了一共有2^3=8组
-  def TAG_ADDR_LEN:Int = 6   // tag长度
-  def WAY_CNT:Int = 3        // 组相连度，决定了每组中有多少路line.  直接映射型cache该参数没用到
+  def LINE_ADDR_LEN:Int = 1  //line内地址长度，决定了每个line具有2^3个word
+  def SET_ADDR_LEN:Int = 2   // 组地址长度，决定了一共有2^3=8组
+  def TAG_ADDR_LEN:Int = 9   // tag长度
+  def WAY_CNT:Int = 1       // 组相连度，决定了每组中有多少路line.  直接映射型cache该参数没用到
   ////////////////////////////
   def MEM_ADDR_LEN    = TAG_ADDR_LEN + SET_ADDR_LEN ; // 计算主存地址长度 MEM_ADDR_LEN，主存大小=2^MEM_ADDR_LEN个line
   def UNUSED_ADDR_LEN = 32 - TAG_ADDR_LEN - SET_ADDR_LEN - LINE_ADDR_LEN - 2 ; // 计算未使用的地址的长度

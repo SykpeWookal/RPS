@@ -102,13 +102,11 @@ class Cache(private val isaParam: Param) extends Module {
   if(isaParam.replacement == 0){
     val FIFO_Choice = RegInit(VecInit(Seq.fill(isaParam.SET_SIZE)(0.U(isaParam.XLEN.W))))//只需要对于每一个set，分别用一个变量记录该set应该换出的way号即可
     switch(cacheState){
-      is(CacheStates.IDLE){
-        wayout_choice := FIFO_Choice(set_addr)
-      }
       is(CacheStates.SwapInOK){
         FIFO_Choice(set_addr) := ((FIFO_Choice(set_addr)+1.U) % isaParam.WAY_SIZE.U)
       }
     }
+    wayout_choice := FIFO_Choice(set_addr)
   }
     /////////////////////LRU////////////
   else if(isaParam.replacement == 1){

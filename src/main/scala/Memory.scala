@@ -4,6 +4,9 @@ import chisel3.util._
 import chisel3.experimental.ChiselEnum
 import Param.Param
 
+import firrtl.annotations.MemoryLoadFileType
+import chisel3.util.experimental.loadMemoryFromFile
+
 //四状态FSM
 object MemStates extends ChiselEnum {
   val IDLE,ReadReq,WriteReq = Value
@@ -28,6 +31,7 @@ class SinglePortRAM extends Module {
   } .otherwise {
     io.dataOut := DontCare
   }
+  loadMemoryFromFile(syncRAM, "src/test/memory.txt",MemoryLoadFileType.Hex)
 }
 
 
@@ -80,6 +84,7 @@ class Memory(private val isaParam: Param) extends Module{
       ///////////////////////////
       transferCounter := 0.U
       when(io.TVALID === true.B){
+        rwmemAddr := io.TDATAW >> 2
         when(io.TUSER === TUSERDefine.readReq){
           memState := MemStates.ReadReq
         }.elsewhen(io.TUSER === TUSERDefine.writeReq){
@@ -87,31 +92,28 @@ class Memory(private val isaParam: Param) extends Module{
         }
       }
     }
+
     is(MemStates.ReadReq){
       when(io.TLAST === false.B) { //需要继续传输数据，由于多传一次地址，需要多一个周期
-        //TVALID := true.B //拉高VALID
-        when(transferCounter === 0.U){ //先传地址
-          rwmemAddr := io.TDATAW << 2
-        }.otherwise{
+
           syncMem.io.addr := rwmemAddr
           TDATAR := syncMem.io.dataOut
-        }
+
         rwmemAddr := rwmemAddr + 1.U
         transferCounter := transferCounter + 1.U //传输计数 +1
       }.otherwise{ //传输完成
         memState := MemStates.IDLE
       }
     }
+
     is(MemStates.WriteReq){
       when(io.TLAST === false.B) { //需要继续传输数据，由于多传一次地址，需要多一个周期
         //TVALID := true.B //拉高VALID
-        when(transferCounter === 0.U){ //先传地址
-          rwmemAddr := io.TDATAW << 2
-        }.otherwise{
+
           syncMem.io.addr := rwmemAddr
           syncMem.io.dataIn := io.TDATAW
           syncMem.io.we := true.B
-        }
+
         rwmemAddr := rwmemAddr + 1.U
         transferCounter := transferCounter + 1.U //传输计数 +1
       }.otherwise{ //传输完成

@@ -75,7 +75,7 @@ object memGen extends App {
 //Core综合
 object rpu_core extends App {
   val isaParam = new Param(XLEN = 32,
-    ThreadNumber = 2,
+    ThreadNumber = 1,
     Embedded = false,
     Atomic = true,
     Multiplication = false,
@@ -108,6 +108,19 @@ object RPSGen extends App {
     SingleFloatingPoint = false,
     DoubleFloatingPoint = false)
   (new chisel3.stage.ChiselStage).emitVerilog(new RPSTop(isaParam))
+}
+
+
+object RPSWithOutCoreGen extends App {
+  val isaParam = new Param(XLEN = 32,
+    ThreadNumber = 2,
+    Embedded = false,
+    Atomic = true,
+    Multiplication = false,
+    Compressed = false,
+    SingleFloatingPoint = false,
+    DoubleFloatingPoint = false)
+  (new chisel3.stage.ChiselStage).emitVerilog(new RPSWithOutCore(isaParam))
 }
 
 
